@@ -35,4 +35,10 @@ class DoctorService:
         profile.soft_delete()
 
     def create_profile(self, user, **data):
-        validate_profile(data)  # Use validator
+        """Create a new doctor profile."""
+        validate_profile(data)
+        # Extract required fields
+        specialty = data.pop('specialty')
+        license_number = data.pop('license_number')
+        # Create profile using factory
+        return DoctorProfileFactory.create_profile(user, specialty, license_number, **data)

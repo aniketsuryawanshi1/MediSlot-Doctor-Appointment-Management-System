@@ -17,7 +17,24 @@ class AuthenticationMiddleware:
 
     def __call__(self, request):
         # Skip auth checks for public endpoints (e.g., login, register)
-        public_paths = ['/auth/login/', '/auth/register/', '/admin/']  # Adjust as needed
+        public_paths = [
+                # Auth – Public
+                '/auth/register/',
+                '/auth/login/',
+                '/auth/token/refresh/',
+                '/auth/otp/resend/',
+                '/auth/verify-otp/',
+                '/auth/password-reset/',
+                '/auth/password-reset-confirm/',
+
+                # Admin
+                '/admin/',
+
+                # API Docs
+                '/api/schema/',
+                '/api/docs/',
+                '/api/redoc/',
+            ]  # Adjust as needed
         if any(request.path.startswith(path) for path in public_paths):
             return self.get_response(request)
 

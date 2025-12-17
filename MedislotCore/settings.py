@@ -35,6 +35,8 @@ DEBUG = os.getenv("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
 
+# FIXED: Added DEFAULT_AUTO_FIELD for Django 6.0
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Application definition
@@ -53,6 +55,8 @@ INSTALLED_APPS = [
     'doctors',  # Now after authentication
     'patients',  # Now after authentication
     'telegram_notifications',  # Now after authentication
+    'drf_spectacular',  # Added for API documentation
+    'django_filters',  # Added for filtering
 ]
 
 MIDDLEWARE = [
@@ -120,7 +124,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),  # type: ignore
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     # type: ignore
     'AUTH_HEADER_TYPES': ('Bearer',),
-
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
 }
 
 REST_FRAMEWORK = {
@@ -134,7 +139,19 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',  # Added for API docs
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # Added pagination
+    'PAGE_SIZE': 10,  # Added pagination size
+}
+
+# API Documentation Settings (Added)
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'MediSlot API',
+    'DESCRIPTION': 'Doctor Appointment Management System - API Documentation',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
 }
 
 
@@ -173,6 +190,68 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Added for production
+
+
+# Logging Configuration (Added)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'medislot.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'propagate': True,
+        },
+        'authentication': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'doctors': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'patients': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+# Create logs directory if it doesn't exist
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(exist_ok=True)
 
 
 #Configuring email settings
