@@ -2,9 +2,19 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 
 
-def add_hours_to_time(base_time, hours):
-    """Add hours to a time object."""
-    dt = datetime.combine(datetime.today(), base_time) + timedelta(hours=hours)
+def add_hours_to_time(date, base_time, hours):
+    """
+    Add hours to a time object.
+    
+    Args:
+        date: The date to combine with time
+        base_time: The base time object
+        hours: Number of hours to add
+    
+    Returns:
+        time object with hours added
+    """
+    dt = datetime.combine(date, base_time) + timedelta(hours=hours)
     return dt.time()
 
 

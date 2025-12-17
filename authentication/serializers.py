@@ -58,9 +58,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Last name must be at least 2 characters long.")
         return value.strip()
 
-    # Validate role.
+    # Validate role - FIXED to match ROLES in models.py
     def validate_role(self, value):
-        allowed_roles = ['is_admin', 'is_superuser', 'is_operator']
+        allowed_roles = ['is_doctor', 'is_superuser', 'is_patient']
         if value not in allowed_roles:
             raise serializers.ValidationError(f"Role must be one of {allowed_roles}.")
         return value

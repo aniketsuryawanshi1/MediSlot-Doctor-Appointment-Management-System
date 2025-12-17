@@ -1,4 +1,3 @@
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
 from django.utils import timezone
@@ -41,10 +40,11 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, username, email, password=None, role=None, **extra_fields):
+        # FIXED: Changed from 'is_admin' to 'is_superuser' to match ROLES
         if not role:
-            raise ValueError('Superuser must have a role')
-        if role != 'is_admin':
-            raise ValueError('Superuser role must be "is_admin" only')
+            role = 'is_superuser'  # Default to is_superuser
+        if role != 'is_superuser':
+            raise ValueError('Superuser role must be "is_superuser" only')
 
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -91,7 +91,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         }
 
     def is_admin_role(self):
-        return self.role == 'is_admin'
+        return self.role == 'is_superuser'  # FIXED: Changed from 'is_admin'
 
     def __str__(self):
         return f"{self.email} ({self.get_role_display()})"
